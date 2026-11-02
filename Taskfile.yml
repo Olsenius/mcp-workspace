@@ -147,6 +147,50 @@ tasks:
     cmds:
       - mani exec --projects tibi-mcp 'go test -race ./...'
 
+  tibi:call:
+    desc: >
+      Make one Tibi MCP tool call against the real account, e.g.
+      `task tibi:call TOOL=get_epub_link ID=123`. Credentials come from
+      1Password (TIBI_OP) and are never written to disk; download links are
+      masked in the output. Exactly one call per run, no retries.
+    silent: true
+    vars:
+      TIBI_OP: '{{.TIBI_OP | default "op://bibliotek/Tibi"}}'
+      READ_ONLY: '{{if or (eq .TOOL "borrow_ebook") (eq .TOOL "send_to_kindle")}}false{{else}}true{{end}}'
+      BIN: '{{.ROOT_DIR}}/.local/bin/tibi-mcp'
+    preconditions:
+      - sh: echo "{{.TOOL}}" | grep -Eqx 'get_ebook|get_epub_link|borrow_ebook|send_to_kindle'
+        msg: TOOL must be get_ebook, get_epub_link, borrow_ebook or send_to_kindle
+      - sh: echo "{{.ID}}" | grep -Eqx '[0-9]{1,12}'
+        msg: ID must be an edition ID of digits
+    cmds:
+      - go -C tibi-mcp build -o "{{.BIN}}" .
+      - |
+        set -euo pipefail
+        envfile=$(mktemp)
+        trap 'rm -f "$envfile"' EXIT
+        printf '%s\n' \
+          'TIBI_CARD_NUMBER={{.TIBI_OP}}/username' \
+          'TIBI_PIN={{.TIBI_OP}}/password' \
+          'MCP_TRANSPORT=stdio' \
+          'MCP_READ_ONLY={{.READ_ONLY}}' > "$envfile"
+        {
+          printf '%s\n' \
+            '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"tibi-call","version":"0"}}}' \
+            '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
+            '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"{{.TOOL}}","arguments":{"edition_id":"{{.ID}}"}}}'
+          sleep 20
+        } | timeout 40 op run --env-file="$envfile" -- "{{.BIN}}" 2>/dev/null | jq -c '
+          select(.id == 2)
+          | if .error then {rpc_error: .error.message}
+            else .result
+              | (.content[0].text | fromjson? // .)
+                | if type == "object" then
+                    (if .download_url then .download_url |= (try sub("^(?<h>https://[^/]+).*$"; "\(.h)/… (masked)") catch "(masked)") else . end)
+                    | (if .description then .description |= .[0:120] + "…" else . end)
+                  else . end
+            end'
+
   build:
     desc: Build the local Docker images
     cmds: [docker compose build]
