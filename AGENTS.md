@@ -43,3 +43,7 @@
 - Prefer the Streamable HTTP transport.
 - Keep servers stateless where possible, so each request can be handled
   without server-side session state.
+- Instrument MCP servers with OpenTelemetry tracing for MCP methods and
+  upstream requests. Configure export with the standard `OTEL_*` environment
+  variables, and keep it disabled when no OTLP endpoint is set. Never record
+  credentials, tokens or personal data in spans.
