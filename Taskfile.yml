@@ -150,19 +150,24 @@ tasks:
   tibi:call:
     desc: >
       Make one Tibi MCP tool call against the real account, e.g.
-      `task tibi:call TOOL=get_epub_link ID=123`. Credentials come from
+      `task tibi:call TOOL=get_epub_link ID=123`, `task tibi:call
+      TOOL=get_kindle_email` or `task tibi:call TOOL=set_kindle_email
+      EMAIL=name@kindle.com`. Credentials come from
       1Password (TIBI_OP) and are never written to disk; download links are
       masked in the output. Exactly one call per run, no retries.
     silent: true
     vars:
       TIBI_OP: '{{.TIBI_OP | default "op://bibliotek/Tibi"}}'
-      READ_ONLY: '{{if or (eq .TOOL "borrow_ebook") (eq .TOOL "send_to_kindle")}}false{{else}}true{{end}}'
+      READ_ONLY: '{{if or (eq .TOOL "borrow_ebook") (eq .TOOL "send_to_kindle") (eq .TOOL "set_kindle_email")}}false{{else}}true{{end}}'
+      ARGS: '{{if eq .TOOL "get_kindle_email"}}{}{{else if eq .TOOL "set_kindle_email"}}{"kindle_email":"{{.EMAIL}}"}{{else}}{"edition_id":"{{.ID}}"}{{end}}'
       BIN: '{{.ROOT_DIR}}/.local/bin/tibi-mcp'
     preconditions:
-      - sh: echo "{{.TOOL}}" | grep -Eqx 'get_ebook|get_epub_link|borrow_ebook|send_to_kindle'
-        msg: TOOL must be get_ebook, get_epub_link, borrow_ebook or send_to_kindle
-      - sh: echo "{{.ID}}" | grep -Eqx '[0-9]{1,12}'
+      - sh: echo "{{.TOOL}}" | grep -Eqx 'get_ebook|get_epub_link|borrow_ebook|send_to_kindle|get_kindle_email|set_kindle_email'
+        msg: TOOL must be get_ebook, get_epub_link, borrow_ebook, send_to_kindle, get_kindle_email or set_kindle_email
+      - sh: echo "{{.TOOL}}" | grep -Eqx 'get_kindle_email|set_kindle_email' || echo "{{.ID}}" | grep -Eqx '[0-9]{1,12}'
         msg: ID must be an edition ID of digits
+      - sh: test "{{.TOOL}}" != set_kindle_email || echo "{{.EMAIL}}" | grep -Eqx '([A-Za-z0-9._+-]+@(kindle\.com|free\.kindle\.com|pbsync\.com))?'
+        msg: EMAIL must be empty or an @kindle.com, @free.kindle.com or @pbsync.com address
     cmds:
       - go -C tibi-mcp build -o "{{.BIN}}" .
       - |
@@ -178,7 +183,7 @@ tasks:
           printf '%s\n' \
             '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"tibi-call","version":"0"}}}' \
             '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
-            '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"{{.TOOL}}","arguments":{"edition_id":"{{.ID}}"}}}'
+            '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"{{.TOOL}}","arguments":{{.ARGS}}}}'
           sleep 20
         } | timeout 40 op run --env-file="$envfile" -- "{{.BIN}}" 2>/dev/null | jq -c '
           select(.id == 2)
