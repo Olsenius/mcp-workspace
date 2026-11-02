@@ -90,14 +90,15 @@ This builds local code and starts the separate Compose project
 <http://localhost:18080/admin>. Backends do not publish host ports.
 If you change DEV_PORT in the ignored `.env`, update PUBLIC_URL as well.
 The admin password is stored in `.env` with mode 600. `env:init` never overwrites
-an existing file. `task build` only builds images; `dev:down` preserves data.
+an existing value; it only adds credentials that are missing. `task build` only
+builds images; `dev:down` preserves data.
 
 Local HTTP is intended for development. Public clients need a separate HTTPS
 and OAuth setup; see the gateway repository for tunnels and deployment.
 Setup and validation tasks do not start application services.
 
-Configure test accounts through the gateway. Bibliofil starts with write tools
-hidden (`MCP_READ_ONLY=true`). Vigilo rotates refresh tokens: do not log in with
+Configure test accounts through the gateway. Bibliofil and Fribo start with write
+tools hidden (`MCP_READ_ONLY=true`). Vigilo rotates refresh tokens: do not log in with
 an account already used by another active token holder without planning the
 migration. Production volumes, credentials and login state are not imported.
 
@@ -114,7 +115,8 @@ The same command runs locally. It checks:
 - Go and Python project selection through mani listings.
 - Environment initialization in a temporary directory: required settings,
   distinct random credentials, mode 600, repeated execution and protection of
-  an existing symlink target.
+  an existing symlink target, and that a credential missing from an older `.env`
+  is added without changing existing values.
 
 CI does not need child repositories, account credentials or running containers.
 `task check:repos` separately checks that all mani projects have local Git

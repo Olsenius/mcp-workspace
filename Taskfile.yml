@@ -54,6 +54,7 @@ tasks:
       - >-
         env -u ADMIN_PASSWORD PUBLIC_URL=http://localhost:18080 DEV_PORT=18080
         BIBLIOFIL_TOKEN=synthetic-bibliofil VIGILO_TOKEN=synthetic-vigilo
+        FRIBO_TOKEN=synthetic-fribo
         docker compose --env-file /dev/null -f compose.yaml config --quiet
       - mani list projects --tags go
       - mani list projects --tags python
@@ -84,11 +85,22 @@ tasks:
                           if line and not line.startswith("#"))
             assert values["DEV_PORT"] == "18080"
             assert values["PUBLIC_URL"] == "http://localhost:18080"
-            tokens = [values[key] for key in ("BIBLIOFIL_TOKEN", "VIGILO_TOKEN", "ADMIN_PASSWORD")]
+            keys = ("BIBLIOFIL_TOKEN", "VIGILO_TOKEN", "FRIBO_TOKEN", "ADMIN_PASSWORD")
+            tokens = [values[key] for key in keys]
             assert all(len(token) >= 32 for token in tokens), "Missing or short credential"
-            assert len(set(tokens)) == 3, "Credentials must be distinct"
+            assert len(set(tokens)) == len(keys), "Credentials must be distinct"
             subprocess.run(command, check=True)
             assert target.read_bytes() == original, "Existing .env was overwritten"
+            # A credential missing from an older .env is added; the rest is kept.
+            older = "".join(line + "\n" for line in original.decode().splitlines()
+                            if not line.startswith("FRIBO_TOKEN="))
+            target.write_text(older)
+            subprocess.run(command, check=True)
+            updated = target.read_text()
+            assert updated.startswith(older), "Existing values were changed"
+            added = dict(line.split("=", 1) for line in updated[len(older):].splitlines())
+            assert list(added) == ["FRIBO_TOKEN"] and len(added["FRIBO_TOKEN"]) >= 32, "Missing credential not added"
+            assert stat.S_IMODE(target.stat().st_mode) == 0o600, "Incorrect .env permissions"
             # An existing symlink must not cause another file to be overwritten.
             target.unlink()
             sentinel = root / "sentinel"
@@ -131,11 +143,11 @@ tasks:
       - mani exec --projects fribo-mcp 'go test -race ./...'
 
   build:
-    desc: Build the three local Docker images
+    desc: Build the local Docker images
     cmds: [docker compose build]
 
   env:init:
-    desc: Create a local .env with random development credentials without overwriting it
+    desc: Create a local .env with random development credentials, or add missing ones without changing existing values
     silent: true
     cmds:
       - |
@@ -146,18 +158,38 @@ tasks:
         import secrets
 
         target = Path(".env")
+        tokens = {
+            "BIBLIOFIL_TOKEN": secrets.token_hex(32),
+            "VIGILO_TOKEN": secrets.token_hex(32),
+            "FRIBO_TOKEN": secrets.token_hex(32),
+            "ADMIN_PASSWORD": secrets.token_urlsafe(32),
+        }
         content = (
             "# Local development only. Do not import production tokens or data.\n"
             "DEV_PORT=18080\n"
             "PUBLIC_URL=http://localhost:18080\n"
-            f"BIBLIOFIL_TOKEN={secrets.token_hex(32)}\n"
-            f"VIGILO_TOKEN={secrets.token_hex(32)}\n"
-            f"ADMIN_PASSWORD={secrets.token_urlsafe(32)}\n"
+            + "".join(f"{key}={value}\n" for key, value in tokens.items())
         )
         try:
             fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
         except FileExistsError:
-            print(".env already exists; no changes made.")
+            # Existing values are kept. Credentials added since the file was
+            # created are appended, but never through a symlink.
+            if target.is_symlink() or not target.is_file():
+                print(".env is not a regular file; no changes made.")
+                raise SystemExit
+            text = target.read_text()
+            present = {line.split("=", 1)[0] for line in text.splitlines() if "=" in line}
+            missing = [key for key in tokens if key not in present]
+            if not missing:
+                print(".env already exists; no changes made.")
+                raise SystemExit
+            fd = os.open(target, os.O_WRONLY | os.O_APPEND | os.O_NOFOLLOW)
+            with os.fdopen(fd, "w") as stream:
+                if text and not text.endswith("\n"):
+                    stream.write("\n")
+                stream.write("".join(f"{key}={tokens[key]}\n" for key in missing))
+            print(f"Added {', '.join(missing)} to .env. Credentials have not been printed.")
         else:
             with os.fdopen(fd, "w") as stream:
                 stream.write(content)
