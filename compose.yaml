@@ -7,12 +7,13 @@ services:
     environment:
       PUBLIC_URL: ${PUBLIC_URL:-http://localhost:18080}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
-      UPSTREAMS: bibliofil=http://bibliofil:8080,vigilo=http://vigilo:8080,fribo=http://fribo:8080
+      UPSTREAMS: bibliofil=http://bibliofil:8080,vigilo=http://vigilo:8080,fribo=http://fribo:8080,tibi=http://tibi:8080
       UPSTREAM_TOKEN_BIBLIOFIL: ${BIBLIOFIL_TOKEN:?Run task env:init}
       UPSTREAM_TOKEN_VIGILO: ${VIGILO_TOKEN:?Run task env:init}
+      UPSTREAM_TOKEN_TIBI: ${TIBI_TOKEN:?Run task env:init}
       UPSTREAM_TOKEN_FRIBO: ${FRIBO_TOKEN:?Run task env:init}
     volumes: [gateway-data:/data]
-    depends_on: [bibliofil, vigilo, fribo]
+    depends_on: [bibliofil, vigilo, fribo, tibi]
   bibliofil:
     build: ./bibliofil-mcp
     environment:
@@ -25,6 +26,15 @@ services:
       MCP_AUTH_TOKEN: ${FRIBO_TOKEN:?Run task env:init}
       MCP_READ_ONLY: 'true'
     volumes: [fribo-data:/data]
+    read_only: true
+    security_opt: [no-new-privileges:true]
+  tibi:
+    build: ./tibi-mcp
+    environment:
+      MCP_AUTH_TOKEN: ${TIBI_TOKEN:?Run task env:init}
+      MCP_READ_ONLY: 'true'
+      TIBI_CARD_NUMBER: ${TIBI_CARD_NUMBER:-}
+      TIBI_PIN: ${TIBI_PIN:-}
     read_only: true
     security_opt: [no-new-privileges:true]
   vigilo:

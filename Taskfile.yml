@@ -54,7 +54,7 @@ tasks:
       - >-
         env -u ADMIN_PASSWORD PUBLIC_URL=http://localhost:18080 DEV_PORT=18080
         BIBLIOFIL_TOKEN=synthetic-bibliofil VIGILO_TOKEN=synthetic-vigilo
-        FRIBO_TOKEN=synthetic-fribo
+        FRIBO_TOKEN=synthetic-fribo TIBI_TOKEN=synthetic-tibi
         docker compose --env-file /dev/null -f compose.yaml config --quiet
       - mani list projects --tags go
       - mani list projects --tags python
@@ -85,7 +85,7 @@ tasks:
                           if line and not line.startswith("#"))
             assert values["DEV_PORT"] == "18080"
             assert values["PUBLIC_URL"] == "http://localhost:18080"
-            keys = ("BIBLIOFIL_TOKEN", "VIGILO_TOKEN", "FRIBO_TOKEN", "ADMIN_PASSWORD")
+            keys = ("BIBLIOFIL_TOKEN", "VIGILO_TOKEN", "FRIBO_TOKEN", "TIBI_TOKEN", "ADMIN_PASSWORD")
             tokens = [values[key] for key in keys]
             assert all(len(token) >= 32 for token in tokens), "Missing or short credential"
             assert len(set(tokens)) == len(keys), "Credentials must be distinct"
@@ -93,13 +93,13 @@ tasks:
             assert target.read_bytes() == original, "Existing .env was overwritten"
             # A credential missing from an older .env is added; the rest is kept.
             older = "".join(line + "\n" for line in original.decode().splitlines()
-                            if not line.startswith("FRIBO_TOKEN="))
+                            if not line.startswith("TIBI_TOKEN="))
             target.write_text(older)
             subprocess.run(command, check=True)
             updated = target.read_text()
             assert updated.startswith(older), "Existing values were changed"
             added = dict(line.split("=", 1) for line in updated[len(older):].splitlines())
-            assert list(added) == ["FRIBO_TOKEN"] and len(added["FRIBO_TOKEN"]) >= 32, "Missing credential not added"
+            assert list(added) == ["TIBI_TOKEN"] and len(added["TIBI_TOKEN"]) >= 32, "Missing credential not added"
             assert stat.S_IMODE(target.stat().st_mode) == 0o600, "Incorrect .env permissions"
             # An existing symlink must not cause another file to be overwritten.
             target.unlink()
@@ -142,6 +142,11 @@ tasks:
     cmds:
       - mani exec --projects fribo-mcp 'go test -race ./...'
 
+  test:tibi:
+    desc: Run Tibi Go tests with the race detector
+    cmds:
+      - mani exec --projects tibi-mcp 'go test -race ./...'
+
   build:
     desc: Build the local Docker images
     cmds: [docker compose build]
@@ -162,6 +167,7 @@ tasks:
             "BIBLIOFIL_TOKEN": secrets.token_hex(32),
             "VIGILO_TOKEN": secrets.token_hex(32),
             "FRIBO_TOKEN": secrets.token_hex(32),
+            "TIBI_TOKEN": secrets.token_hex(32),
             "ADMIN_PASSWORD": secrets.token_urlsafe(32),
         }
         content = (

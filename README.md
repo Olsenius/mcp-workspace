@@ -3,7 +3,8 @@
 Shared tools and working practices for [mcp-gateway](https://github.com/Olsenius/mcp-gateway),
 [vigilo-connector](https://github.com/Olsenius/vigilo-connector),
 [bibliofil-mcp](https://github.com/Olsenius/bibliofil-mcp) and
-[fribo-mcp](https://github.com/Olsenius/fribo-mcp), following the workspace-concept pattern: mise for tools,
+[fribo-mcp](https://github.com/Olsenius/fribo-mcp) and
+[tibi-mcp](https://github.com/Olsenius/tibi-mcp), following the workspace-concept pattern: mise for tools,
 Task for commands, mani for repositories and AGENTS.md for agent instructions.
 
 Each application keeps its own Git history. This repository owns the surrounding
@@ -21,6 +22,7 @@ mcp-workspace/
   vigilo-connector/   # separate repository, ignored
   bibliofil-mcp/      # separate repository, ignored
   fribo-mcp/          # separate repository, ignored
+  tibi-mcp/           # separate repository, ignored
 ```
 
 Existing checkouts can be linked into the workspace using ignored symbolic
@@ -57,6 +59,7 @@ task test:gateway
 task test:vigilo
 task test:bibliofil
 task test:fribo
+task test:tibi
 task test             # all application suites, sequentially
 ```
 
@@ -128,3 +131,11 @@ them through the workspace test tasks when changing application code.
 
 Workspace checks do not prove application behavior or a working deployment.
 Container builds and startup have not yet been verified as part of this setup.
+
+Tibi supports public e-book search without credentials. To test authenticated
+book status, set `TIBI_CARD_NUMBER` and `TIBI_PIN` in the ignored local `.env`.
+Tibi keeps login cookies in memory and starts read-only. To enable borrowing and
+Kindle sending, change its Compose `MCP_READ_ONLY` to `'false'` in a local override.
+The Kindle address must already be configured in the Tibi profile. Tibi account
+settings are currently environment-only, not editable through the gateway admin.
+See `tibi-mcp/README.md` for verification limitations and setup.

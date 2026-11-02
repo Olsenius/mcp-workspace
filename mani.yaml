@@ -18,3 +18,7 @@ projects:
     path: fribo-mcp
     tags: [go]
     url: git@github.com:Olsenius/fribo-mcp.git
+  tibi-mcp:
+    path: tibi-mcp
+    tags: [go]
+    url: git@github.com:Olsenius/tibi-mcp.git
