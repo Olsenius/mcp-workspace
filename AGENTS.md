@@ -34,3 +34,12 @@
   Vigilo account requires a planned migration from its active token holder.
 - Publishing releases and changing production require an explicit request
   beyond the push authorization above.
+
+## New MCP servers
+
+- Prefer Go for new MCP servers.
+- Expose servers remotely through mcp-gateway rather than publishing them
+  directly.
+- Prefer the Streamable HTTP transport.
+- Keep servers stateless where possible, so each request can be handled
+  without server-side session state.
