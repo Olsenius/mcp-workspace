@@ -23,7 +23,8 @@
   it clones missing repositories and pulls all projects with `--ff-only`.
 - For workspace changes, run `task check`; use `task check:repos` to verify local
   checkouts. For application changes, run the relevant `task test:gateway`,
-  `task test:vigilo`, `task test:bibliofil`, or `task test` for all applications.
+  `task test:vigilo`, `task test:bibliofil`, `task test:fribo`, or `task test` for
+  all applications.
   Configuration checks do not replace application tests.
 - Report what was actually verified and any failures or limitations.
 - Use synthetic data. Never print or commit credentials, tokens, personal data

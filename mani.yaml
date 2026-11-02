@@ -14,3 +14,7 @@ projects:
     path: bibliofil-mcp
     tags: [go]
     url: git@github.com:Olsenius/bibliofil-mcp.git
+  fribo-mcp:
+    path: fribo-mcp
+    tags: [go]
+    url: git@github.com:Olsenius/fribo-mcp.git

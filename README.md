@@ -1,7 +1,7 @@
 # MCP-workspace
 
-Shared tools and working practices for `mcp-gateway`, `vigilo-connector` and
-`bibliofil-mcp`, following the workspace-concept pattern: mise for tools,
+Shared tools and working practices for `mcp-gateway`, `vigilo-connector`,
+`bibliofil-mcp` and `fribo-mcp`, following the workspace-concept pattern: mise for tools,
 Task for commands, mani for repositories and AGENTS.md for agent instructions.
 
 Each application keeps its own Git history. This repository owns the surrounding
@@ -18,6 +18,7 @@ mcp-workspace/
   mcp-gateway/        # separate repository, ignored
   vigilo-connector/   # separate repository, ignored
   bibliofil-mcp/      # separate repository, ignored
+  fribo-mcp/          # separate repository, ignored
 ```
 
 Existing checkouts can be linked into the workspace using ignored symbolic
@@ -53,6 +54,7 @@ task check            # validate the workspace
 task test:gateway
 task test:vigilo
 task test:bibliofil
+task test:fribo
 task test             # all application suites, sequentially
 ```
 

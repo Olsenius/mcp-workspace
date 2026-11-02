@@ -125,6 +125,11 @@ tasks:
     cmds:
       - mani exec --projects bibliofil-mcp 'go test -race ./...'
 
+  test:fribo:
+    desc: Run Fribo Go tests with the race detector
+    cmds:
+      - mani exec --projects fribo-mcp 'go test -race ./...'
+
   build:
     desc: Build the three local Docker images
     cmds: [docker compose build]
