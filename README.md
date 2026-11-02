@@ -1,7 +1,9 @@
 # MCP-workspace
 
-Shared tools and working practices for `mcp-gateway`, `vigilo-connector`,
-`bibliofil-mcp` and `fribo-mcp`, following the workspace-concept pattern: mise for tools,
+Shared tools and working practices for [mcp-gateway](https://github.com/Olsenius/mcp-gateway),
+[vigilo-connector](https://github.com/Olsenius/vigilo-connector),
+[bibliofil-mcp](https://github.com/Olsenius/bibliofil-mcp) and
+[fribo-mcp](https://github.com/Olsenius/fribo-mcp), following the workspace-concept pattern: mise for tools,
 Task for commands, mani for repositories and AGENTS.md for agent instructions.
 
 Each application keeps its own Git history. This repository owns the surrounding
@@ -94,7 +96,8 @@ an existing value; it only adds credentials that are missing. `task build` only
 builds images; `dev:down` preserves data.
 
 Local HTTP is intended for development. Public clients need a separate HTTPS
-and OAuth setup; see the gateway repository for tunnels and deployment.
+and OAuth setup. To run the published images with a tunnel, use the
+[gateway's Compose example](https://github.com/Olsenius/mcp-gateway#quick-start-docker-compose).
 Setup and validation tasks do not start application services.
 
 Configure test accounts through the gateway. Bibliofil and Fribo start with write
