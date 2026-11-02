@@ -1,0 +1,36 @@
+name: mcp-workspace-dev
+
+services:
+  gateway:
+    build: ./mcp-gateway
+    ports: ['127.0.0.1:${DEV_PORT:-18080}:8080']
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:18080}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      UPSTREAMS: bibliofil=http://bibliofil:8080,vigilo=http://vigilo:8080
+      UPSTREAM_TOKEN_BIBLIOFIL: ${BIBLIOFIL_TOKEN:?Run task env:init}
+      UPSTREAM_TOKEN_VIGILO: ${VIGILO_TOKEN:?Run task env:init}
+    volumes: [gateway-data:/data]
+    depends_on: [bibliofil, vigilo]
+  bibliofil:
+    build: ./bibliofil-mcp
+    environment:
+      MCP_AUTH_TOKEN: ${BIBLIOFIL_TOKEN:?Run task env:init}
+      MCP_READ_ONLY: 'true'
+    volumes: [bibliofil-data:/data]
+  vigilo:
+    build: ./vigilo-connector
+    environment:
+      MCP_AUTH_TOKEN: ${VIGILO_TOKEN:?Run task env:init}
+      MCP_ALLOWED_ORIGINS: ${PUBLIC_URL:-http://localhost:18080}
+      DATA_DIR: /data
+      VIGILO_CONFIG_DIR: /data/vigilo
+    volumes: [vigilo-data:/data]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+
+volumes:
+  gateway-data:
+  bibliofil-data:
+  vigilo-data:

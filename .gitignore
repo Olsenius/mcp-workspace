@@ -1,0 +1,8 @@
+/.env
+/.local/
+__pycache__/
+# mani #
+bibliofil-mcp
+vigilo-connector
+mcp-gateway
+# mani #

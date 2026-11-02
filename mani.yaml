@@ -1,0 +1,16 @@
+projects:
+  mcp-workspace:
+    path: .
+    url: git@github.com:Olsenius/mcp-workspace.git
+  mcp-gateway:
+    path: mcp-gateway
+    tags: [go]
+    url: git@github.com:Olsenius/mcp-gateway.git
+  vigilo-connector:
+    path: vigilo-connector
+    tags: [python]
+    url: git@github.com:Olsenius/vigilo-connector.git
+  bibliofil-mcp:
+    path: bibliofil-mcp
+    tags: [go]
+    url: git@github.com:Olsenius/bibliofil-mcp.git
