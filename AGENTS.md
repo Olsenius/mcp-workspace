@@ -39,8 +39,22 @@
 ## New MCP servers
 
 - Prefer Go for new MCP servers.
-- Expose servers remotely through mcp-gateway rather than publishing them
-  directly.
+- Run every MCP server behind mcp-gateway. Never publish a server directly
+  or give it its own public port, login or OAuth; the gateway handles access.
+- Follow the gateway's upstream contract (mcp-gateway README, "The upstream
+  contract") so every server works the same way:
+  - `/mcp` with `Authorization: Bearer <MCP_AUTH_TOKEN>`;
+  - `GET /healthz` without auth for liveness;
+  - `GET /healthz?check=1` running real checks with the current settings;
+  - `GET /config` and `POST /config` for the settings page, with
+    `CONFIG_TOKEN` defaulting to `MCP_AUTH_TOKEN`. Use environment variable
+    names as keys, never return secrets, mark environment-set values as
+    locked, and apply saved settings without a restart.
+  Store settings in `DATA_DIR` (default `/data`, files mode 0600); environment
+  variables always win. Use fribo-mcp and tibi-mcp as reference.
+- When adding a server, register it in mani.yaml, this workspace's
+  compose.yaml and Taskfile, and mcp-gateway's docker-compose.yml,
+  .env.example and README. Publish its image to GHCR from its repository.
 - Prefer the Streamable HTTP transport.
 - Keep servers stateless where possible, so each request can be handled
   without server-side session state.
