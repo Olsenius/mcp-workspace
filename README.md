@@ -132,10 +132,9 @@ them through the workspace test tasks when changing application code.
 Workspace checks do not prove application behavior or a working deployment.
 Container builds and startup have not yet been verified as part of this setup.
 
-Tibi supports public e-book search without credentials. To test authenticated
-book status, set `TIBI_CARD_NUMBER` and `TIBI_PIN` in the ignored local `.env`.
-Tibi keeps login cookies in memory and starts read-only. To enable borrowing and
-Kindle sending, change its Compose `MCP_READ_ONLY` to `'false'` in a local override.
-The Kindle address must already be configured in the Tibi profile. Tibi account
-settings are currently environment-only, not editable through the gateway admin.
+Tibi supports public e-book search without credentials. Like the other
+servers, its account is set on the gateway admin page (stored in the `tibi-data`
+volume), and it starts read-only. Use synthetic data in the dev environment;
+`task tibi:call` makes single calls against the real account with credentials
+from 1Password.
 See `tibi-mcp/README.md` for verification limitations and setup.

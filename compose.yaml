@@ -33,8 +33,7 @@ services:
     environment:
       MCP_AUTH_TOKEN: ${TIBI_TOKEN:?Run task env:init}
       MCP_READ_ONLY: 'true'
-      TIBI_CARD_NUMBER: ${TIBI_CARD_NUMBER:-}
-      TIBI_PIN: ${TIBI_PIN:-}
+    volumes: [tibi-data:/data]
     read_only: true
     security_opt: [no-new-privileges:true]
   vigilo:
@@ -53,4 +52,5 @@ volumes:
   gateway-data:
   bibliofil-data:
   fribo-data:
+  tibi-data:
   vigilo-data:
