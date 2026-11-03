@@ -29,6 +29,7 @@ own `AGENTS.md`; read it before changing that repository.
 | fribo-mcp | Go | `task test:fribo` | yes | GHCR |
 | tibi-mcp | Go | `task test:tibi` | yes | GHCR |
 | vigilo-connector | Python | `task test:vigilo` | yes | GHCR |
+| spond-no-match-mcp | Python | `task test:spond` | no | GHCR |
 
 Child repositories are ignored by this repository's Git. Some are symbolic
 links to checkouts elsewhere; edits through a link change the original files.

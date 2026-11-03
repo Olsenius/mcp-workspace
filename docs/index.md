@@ -11,6 +11,7 @@ around them.
 | [vigilo-connector](https://github.com/Olsenius/vigilo-connector) | Vigilo for parents: messages, timetable, absences |
 | [fribo-mcp](https://github.com/Olsenius/fribo-mcp) | Cabin road plowing: register stays |
 | [tibi-mcp](https://github.com/Olsenius/tibi-mcp) | Tibi e-books: search, borrow, Kindle, EPUB |
+| [spond-no-match-mcp](https://github.com/Olsenius/spond-no-match-mcp) | Spond: the kids' activities, responses and participants |
 
 See [Architecture](architecture.md) for how they fit together.
 

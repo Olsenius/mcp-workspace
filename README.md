@@ -3,8 +3,9 @@
 Shared tools and working practices for [mcp-gateway](https://github.com/Olsenius/mcp-gateway),
 [vigilo-connector](https://github.com/Olsenius/vigilo-connector),
 [bibliofil-mcp](https://github.com/Olsenius/bibliofil-mcp) and
-[fribo-mcp](https://github.com/Olsenius/fribo-mcp) and
-[tibi-mcp](https://github.com/Olsenius/tibi-mcp), following the workspace-concept pattern: mise for tools,
+[fribo-mcp](https://github.com/Olsenius/fribo-mcp),
+[tibi-mcp](https://github.com/Olsenius/tibi-mcp) and
+[spond-no-match-mcp](https://github.com/Olsenius/spond-no-match-mcp), following the workspace-concept pattern: mise for tools,
 Task for commands, mani for repositories and AGENTS.md for agent instructions.
 
 Each application keeps its own Git history. This repository owns the surrounding
@@ -23,6 +24,7 @@ mcp-workspace/
   bibliofil-mcp/      # separate repository, ignored
   fribo-mcp/          # separate repository, ignored
   tibi-mcp/           # separate repository, ignored
+  spond-no-match-mcp/ # separate repository, ignored
 ```
 
 Existing checkouts can be linked into the workspace using ignored symbolic
@@ -64,11 +66,12 @@ task test:vigilo
 task test:bibliofil
 task test:fribo
 task test:tibi
+task test:spond
 task test             # all application suites, sequentially
 ```
 
-Go tests use `go test -race ./...`. Vigilo uses `.venv/bin/python -m pytest -q`
-from its repository. Read each repository's instructions before changing code.
+Go tests use `go test -race ./...`. Vigilo and Spond use `.venv/bin/python -m pytest -q`
+from their repositories. Read each repository's instructions before changing code.
 
 mani.yaml is the repository inventory, including this workspace (`path: .`).
 The `go` and `python` tags select projects for setup and combined testing.
@@ -142,3 +145,10 @@ volume), and it starts read-only. Use synthetic data in the dev environment;
 `task tibi:call` makes single calls against the real account with credentials
 from 1Password.
 See `tibi-mcp/README.md` for verification limitations and setup.
+
+Spond is a Python fork of
+[Starefossen/spond-no-match-mcp](https://github.com/Starefossen/spond-no-match-mcp).
+It has no settings page yet: its account comes from `SPOND_USERNAME` and
+`SPOND_PASSWORD`, so in the dev environment it starts read-only without an
+account and its tools fail. It finds the kids through guardian links and keeps
+other families' data out of its cache and answers; see its README.

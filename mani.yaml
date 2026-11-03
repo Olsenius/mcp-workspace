@@ -22,3 +22,7 @@ projects:
     path: tibi-mcp
     tags: [go]
     url: git@github.com:Olsenius/tibi-mcp.git
+  spond-no-match-mcp:
+    path: spond-no-match-mcp
+    tags: [python]
+    url: git@github.com:Olsenius/spond-no-match-mcp.git

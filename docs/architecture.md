@@ -21,6 +21,7 @@ flowchart LR
         vigilo[vigilo-connector]
         fribo[fribo-mcp]
         tibi[tibi-mcp]
+        spond[spond-no-match-mcp]
     end
 
     subgraph services [External services]
@@ -28,6 +29,7 @@ flowchart LR
         vg[(Vigilo)]
         fr[(Fribo portal)]
         tb[(tibi.no)]
+        sp[(Spond)]
     end
 
     otel[(OTLP collector<br/>optional)]
@@ -37,6 +39,7 @@ flowchart LR
     gateway -->|/vigilo/mcp| vigilo --> vg
     gateway -->|/fribo/mcp| fribo --> fr
     gateway -->|/tibi/mcp| tibi --> tb
+    gateway -->|/spond/mcp| spond --> sp
     gateway -.->|traces| otel
 ```
 
@@ -86,7 +89,7 @@ flowchart TB
     task[Taskfile.yml<br/>all commands]
     mani[mani.yaml<br/>repositories and tags]
     compose[compose.yaml<br/>local stack from source]
-    repos[mcp-gateway · bibliofil-mcp · vigilo-connector<br/>fribo-mcp · tibi-mcp]
+    repos[mcp-gateway · bibliofil-mcp · vigilo-connector<br/>fribo-mcp · tibi-mcp · spond-no-match-mcp]
     ci[GitHub Actions<br/>task check, docs build]
 
     mise --> task
