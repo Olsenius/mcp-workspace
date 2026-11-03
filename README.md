@@ -148,7 +148,6 @@ See `tibi-mcp/README.md` for verification limitations and setup.
 
 Spond is a Python fork of
 [Starefossen/spond-no-match-mcp](https://github.com/Starefossen/spond-no-match-mcp).
-It has no settings page yet: its account comes from `SPOND_USERNAME` and
-`SPOND_PASSWORD`, so in the dev environment it starts read-only without an
-account and its tools fail. It finds the kids through guardian links and keeps
+Like the other servers, its account is set on the gateway admin page (stored in
+the `spond-data` volume), and it starts read-only in the dev environment. It finds the kids through guardian links and keeps
 other families' data out of its cache and answers; see its README.

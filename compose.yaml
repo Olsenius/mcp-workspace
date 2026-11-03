@@ -37,13 +37,12 @@ services:
     volumes: [tibi-data:/data]
     read_only: true
     security_opt: [no-new-privileges:true]
-  # Spond has no settings page yet; without SPOND_USERNAME and SPOND_PASSWORD
-  # it starts, but its tools and /healthz?check=1 fail.
   spond:
     build: ./spond-no-match-mcp
     environment:
       MCP_AUTH_TOKEN: ${SPOND_TOKEN:?Run task env:init}
       MCP_READ_ONLY: 'true'
+    volumes: [spond-data:/data]
     read_only: true
     security_opt: [no-new-privileges:true]
   vigilo:
@@ -63,4 +62,5 @@ volumes:
   bibliofil-data:
   fribo-data:
   tibi-data:
+  spond-data:
   vigilo-data:
