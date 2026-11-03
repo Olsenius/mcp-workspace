@@ -3,6 +3,8 @@
 - The workspace owns tools, commands and shared working practices. Application
   code belongs in its own repository. Read that repository's AGENTS.md before
   making changes.
+- docs/agents.md expands on these instructions with a repository map,
+  verification table and checklists. Keep docs/ current with your changes.
 - Use `task --list` to discover shared routines. Define commands and task logic
   directly in Taskfile.yml; do not introduce wrapper scripts for tasks.
 - mani.yaml is the source of truth for repositories, paths and language tags.

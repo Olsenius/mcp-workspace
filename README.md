@@ -30,6 +30,10 @@ links. Changes through those links affect the original files. On a new machine,
 mani clones each project into its configured directory. GitHub SSH access is
 required for cloning and synchronization.
 
+Documentation lives in [docs/](docs/index.md) and is built with MkDocs:
+`task docs:serve` previews it locally. It includes an architecture overview
+and a [guide for agents](docs/agents.md).
+
 ## Getting started
 
 Install Git, mise and Docker with Compose, then run from the workspace root:

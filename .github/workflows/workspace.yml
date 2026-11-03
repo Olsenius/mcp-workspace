@@ -25,5 +25,7 @@ jobs:
           version: 2026.10.4
       - name: Validate workspace
         run: task check
+      - name: Build docs
+        run: task docs:build
       - name: Check whitespace
         run: git diff-tree --check --root HEAD

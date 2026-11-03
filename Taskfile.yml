@@ -196,6 +196,27 @@ tasks:
                   else . end
             end'
 
+  docs:deps:
+    internal: true
+    status:
+      - cmp -s docs/requirements.txt .local/docs-venv/requirements.txt
+    cmds:
+      - python3 -m venv .local/docs-venv
+      - .local/docs-venv/bin/python -m pip install -q -r docs/requirements.txt
+      - cp docs/requirements.txt .local/docs-venv/requirements.txt
+
+  docs:build:
+    env: {NO_MKDOCS_2_WARNING: '1'}
+    desc: Build the MkDocs site in strict mode into .local/site
+    deps: [docs:deps]
+    cmds: [.local/docs-venv/bin/mkdocs build --strict]
+
+  docs:serve:
+    env: {NO_MKDOCS_2_WARNING: '1'}
+    desc: Preview the docs with live reload at http://localhost:8000
+    deps: [docs:deps]
+    cmds: [.local/docs-venv/bin/mkdocs serve]
+
   build:
     desc: Build the local Docker images
     cmds: [docker compose build]
