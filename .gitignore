@@ -3,10 +3,12 @@
 /.local/
 __pycache__/
 # mani #
+tibi-mcp
+fribo-mcp
 bibliofil-mcp
 vigilo-connector
 mcp-gateway
-fribo-mcp
+memory-mcp
 spond-no-match-mcp
 # mani #
 

@@ -22,6 +22,10 @@ projects:
     path: tibi-mcp
     tags: [go]
     url: git@github.com:Olsenius/tibi-mcp.git
+  memory-mcp:
+    path: memory-mcp
+    tags: [go]
+    url: git@github.com:Olsenius/memory-mcp.git
   spond-no-match-mcp:
     path: spond-no-match-mcp
     tags: [python]
