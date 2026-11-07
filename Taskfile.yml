@@ -55,6 +55,7 @@ tasks:
         env -u ADMIN_PASSWORD PUBLIC_URL=http://localhost:18080 DEV_PORT=18080
         BIBLIOFIL_TOKEN=synthetic-bibliofil VIGILO_TOKEN=synthetic-vigilo
         FRIBO_TOKEN=synthetic-fribo TIBI_TOKEN=synthetic-tibi SPOND_TOKEN=synthetic-spond
+        MEMORY_TOKEN=synthetic-memory
         docker compose --env-file /dev/null -f compose.yaml config --quiet
       - mani list projects --tags go
       - mani list projects --tags python
@@ -85,7 +86,7 @@ tasks:
                           if line and not line.startswith("#"))
             assert values["DEV_PORT"] == "18080"
             assert values["PUBLIC_URL"] == "http://localhost:18080"
-            keys = ("BIBLIOFIL_TOKEN", "VIGILO_TOKEN", "FRIBO_TOKEN", "TIBI_TOKEN", "SPOND_TOKEN", "ADMIN_PASSWORD")
+            keys = ("BIBLIOFIL_TOKEN", "VIGILO_TOKEN", "FRIBO_TOKEN", "TIBI_TOKEN", "SPOND_TOKEN", "MEMORY_TOKEN", "ADMIN_PASSWORD")
             tokens = [values[key] for key in keys]
             assert all(len(token) >= 32 for token in tokens), "Missing or short credential"
             assert len(set(tokens)) == len(keys), "Credentials must be distinct"
@@ -146,6 +147,11 @@ tasks:
     desc: Run Tibi Go tests with the race detector
     cmds:
       - mani exec --projects tibi-mcp 'go test -race ./...'
+
+  test:memory:
+    desc: Run memory Go tests with the race detector
+    cmds:
+      - mani exec --projects memory-mcp 'go test -race ./...'
 
   test:spond:
     desc: Run Spond tests with synthetic data
@@ -244,6 +250,7 @@ tasks:
             "FRIBO_TOKEN": secrets.token_hex(32),
             "TIBI_TOKEN": secrets.token_hex(32),
             "SPOND_TOKEN": secrets.token_hex(32),
+            "MEMORY_TOKEN": secrets.token_hex(32),
             "ADMIN_PASSWORD": secrets.token_urlsafe(32),
         }
         content = (

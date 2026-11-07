@@ -7,14 +7,15 @@ services:
     environment:
       PUBLIC_URL: ${PUBLIC_URL:-http://localhost:18080}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
-      UPSTREAMS: bibliofil=http://bibliofil:8080,vigilo=http://vigilo:8080,fribo=http://fribo:8080,tibi=http://tibi:8080,spond=http://spond:8080
+      UPSTREAMS: bibliofil=http://bibliofil:8080,vigilo=http://vigilo:8080,fribo=http://fribo:8080,tibi=http://tibi:8080,spond=http://spond:8080,memory=http://memory:8080
       UPSTREAM_TOKEN_BIBLIOFIL: ${BIBLIOFIL_TOKEN:?Run task env:init}
       UPSTREAM_TOKEN_VIGILO: ${VIGILO_TOKEN:?Run task env:init}
       UPSTREAM_TOKEN_TIBI: ${TIBI_TOKEN:?Run task env:init}
       UPSTREAM_TOKEN_FRIBO: ${FRIBO_TOKEN:?Run task env:init}
       UPSTREAM_TOKEN_SPOND: ${SPOND_TOKEN:?Run task env:init}
+      UPSTREAM_TOKEN_MEMORY: ${MEMORY_TOKEN:?Run task env:init}
     volumes: [gateway-data:/data]
-    depends_on: [bibliofil, vigilo, fribo, tibi, spond]
+    depends_on: [bibliofil, vigilo, fribo, tibi, spond, memory]
   bibliofil:
     build: ./bibliofil-mcp
     environment:
@@ -45,6 +46,20 @@ services:
     volumes: [spond-data:/data]
     read_only: true
     security_opt: [no-new-privileges:true]
+  memory:
+    build: ./memory-mcp
+    environment:
+      MCP_AUTH_TOKEN: ${MEMORY_TOKEN:?Run task env:init}
+      # Read-only until the vault's enabling change is applied: without it the
+      # memory layer does not exist and nothing can be written.
+      MCP_READ_ONLY: ${MEMORY_READ_ONLY:-true}
+      MEMORY_GIT_REMOTE: ${MEMORY_GIT_REMOTE:-git@github.com:Olsenius/agent.git}
+      MEMORY_SSH_KEY_FILE: ${MEMORY_SSH_KEY_FILE:-}
+      MEMORY_KNOWN_HOSTS_FILE: ${MEMORY_KNOWN_HOSTS_FILE:-}
+    volumes: [memory-data:/data]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
   vigilo:
     build: ./vigilo-connector
     environment:
@@ -63,4 +78,5 @@ volumes:
   fribo-data:
   tibi-data:
   spond-data:
+  memory-data:
   vigilo-data:
