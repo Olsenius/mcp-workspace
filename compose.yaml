@@ -43,6 +43,7 @@ services:
     environment:
       MCP_AUTH_TOKEN: ${SPOND_TOKEN:?Run task env:init}
       MCP_READ_ONLY: 'true'
+      DOCLING_URL: http://docling:5001
     volumes: [spond-data:/data]
     read_only: true
     security_opt: [no-new-privileges:true]
@@ -71,6 +72,21 @@ services:
     read_only: true
     tmpfs: [/tmp]
     security_opt: [no-new-privileges:true]
+  # Shared PDF-to-text service (tables as Markdown, OCR) for the MCP servers.
+  # No auth: internal network only, never published. Servers fall back to
+  # their own PDF reading when it is down.
+  docling:
+    image: quay.io/docling-project/docling-serve-cpu:v1.38.2
+    mem_limit: 4g
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD, curl, -sf, http://127.0.0.1:5001/health]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
 
 volumes:
   gateway-data:

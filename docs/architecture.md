@@ -22,6 +22,7 @@ flowchart LR
         fribo[fribo-mcp]
         tibi[tibi-mcp]
         spond[spond-no-match-mcp]
+        docling[docling-serve<br/>PDF to text]
     end
 
     subgraph services [External services]
@@ -40,6 +41,7 @@ flowchart LR
     gateway -->|/fribo/mcp| fribo --> fr
     gateway -->|/tibi/mcp| tibi --> tb
     gateway -->|/spond/mcp| spond --> sp
+    spond -.->|PDF attachments| docling
     gateway -.->|traces| otel
 ```
 
@@ -101,3 +103,10 @@ flowchart TB
 The local stack (`task dev:up`) runs as the Compose project
 `mcp-workspace-dev`. Only the gateway is published, on
 `127.0.0.1:18080`; servers start with `MCP_READ_ONLY=true`.
+
+The stack also runs a shared docling-serve (`docling`, CPU image, 4 GB memory
+limit) that turns PDFs into text, with tables as Markdown and OCR for scanned
+pages. It has no auth and is never published. Servers reach it at
+`http://docling:5001` through their `DOCLING_URL` setting and fall back to their
+own PDF reading when it is down. It uses about 0.8 GB idle and 1.5–2.5 GB while
+converting, and the image is about 8 GB.

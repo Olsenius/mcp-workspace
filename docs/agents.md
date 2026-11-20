@@ -74,6 +74,9 @@ publish images to GHCR.
   published. `task dev:down` keeps the data volumes.
 - Servers start with `MCP_READ_ONLY=true`. Account settings are entered on
   the gateway admin page and stored in each server's volume.
+- `docling` is a shared docling-serve for reading PDFs. A server that needs
+  PDF text gets `DOCLING_URL: http://docling:5001` and must keep working
+  without it.
 - Use synthetic data. Do not import production tokens, volumes or login state.
 
 ## Safety rules
